@@ -1,0 +1,23 @@
+<resources>
+
+    <string name="app_name">Maps App</string>
+    <string name="button_get_started">Get started</string>
+    <string name="text_select_type">Select a type of a map</string>
+    <string name="item_menu_about">About</string>
+    <string name="item_menu_off_app">Official app</string>
+    <string name="item_menu_exit">Exit</string>
+    <string name="map">Viewing</string>
+    <string name="item_menu_traffic">Traffic</string>
+    <string name="item_menu_clean_map">Clean map</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="item_menu_search">Search</string>
+    <string name="search_for_places">Search for places</string>
+    <string name="input_search_hint">Search…</string>
+    <string name="button_search">Search</string>
+    <string name="version_app">1.0</string>
+    <string name="open_github">Open in Github</string>
+    <string name="about">About</string>
+    <string name="dialog_ok">OK</string>
+
+</resources>
