@@ -66,7 +66,6 @@ public class MapActivity extends AppCompatActivity
     private RestoreData mRestoreData = null;
 
     private boolean mLocationPermissionGranted = false;
-    // TODO: save traffic
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +84,19 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.map, menu);
+
+        // restore the traffic
+        MenuItem menuItem = menu.findItem(R.id.item_menu_traffic);
+
+        if (mRestoreData != null) {
+            if (mRestoreData.getTraffic()) {
+                mGoogleMap.setTrafficEnabled(true);
+                menuItem.setChecked(true);
+            } else {
+                mGoogleMap.setTrafficEnabled(false);
+                menuItem.setChecked(false);
+            }
+        }
         return true;
     }
 
@@ -124,12 +136,12 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // saving the last zoom, coordinates and pins
+        // saving the last zoom, coordinates, pins and enabled traffic
         double lat = mGoogleMap.getCameraPosition().target.latitude;
         double lon = mGoogleMap.getCameraPosition().target.longitude;
         float zoom = mGoogleMap.getCameraPosition().zoom;
 
-        RestoreData restoreData = new RestoreData(zoom, lat, lon, mListPins);
+        RestoreData restoreData = new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled(), mListPins);
         savedInstanceState.putParcelable("restore_data", restoreData);
 
         super.onSaveInstanceState(savedInstanceState);
@@ -140,7 +152,7 @@ public class MapActivity extends AppCompatActivity
         super.onRestoreInstanceState(savedInstanceState);
 
         if (savedInstanceState != null) {
-            // get the last zoom, coordinates and pins
+            // get the last zoom, coordinates, pins and enabled traffic
             mRestoreData = savedInstanceState.getParcelable("restore_data");
         }
     }
@@ -350,7 +362,7 @@ public class MapActivity extends AppCompatActivity
                 dialog.setOnSavePinEditDialogListener(new PinEditDialogFragment.PinEditDialogListener() {
                     @Override
                     public void onSavePinEditDialogListener(String text) {
-                        updatePinInList(
+                        updatePinTitleInList(
                                 text,
                                 marker.getTitle(),
                                 marker.getPosition().latitude,
@@ -445,8 +457,7 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    // update title
-    private void updatePinInList(String new_title, String old_title, double lat, double lon) {
+    private void updatePinTitleInList(String new_title, String old_title, double lat, double lon) {
         for (int i = 0; i < mListPins.size(); i++) {
             if (mListPins.get(i).getTitle().equals(old_title) &&
                 mListPins.get(i).getLat() == lat &&
