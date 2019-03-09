@@ -53,6 +53,12 @@ public class MapActivity extends AppCompatActivity
     private static final int REQUEST_CODE_SEARCH_PLACE = 1;
     private static final int DEFAULT_ZOOM = 15;
 
+    // restore data after the screen rotation
+    private static float sZoom = 0;
+    private static double sLat = 0;
+    private static double sLon = 0;
+    private static boolean sRestoreData = false;
+
     private GoogleMap mGoogleMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
@@ -113,6 +119,33 @@ public class MapActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // saving the last zoom, coordinates
+        double lat = mGoogleMap.getCameraPosition().target.latitude;
+        double lon = mGoogleMap.getCameraPosition().target.longitude;
+        float zoom = mGoogleMap.getCameraPosition().zoom;
+
+        savedInstanceState.putDouble("map_lat", lat);
+        savedInstanceState.putDouble("map_lon", lon);
+        savedInstanceState.putFloat("map_zoom", zoom);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            // get the last zoom and coordinates
+            sLat = savedInstanceState.getDouble("map_lat");
+            sLon = savedInstanceState.getDouble("map_lon");
+            sZoom = savedInstanceState.getFloat("map_zoom", 15);
+            sRestoreData = true;
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -135,6 +168,7 @@ public class MapActivity extends AppCompatActivity
         getDeviceLocation();
 
         setTypeOfMap();
+        restoreData();
 
         // set the ui settings
         UiSettings uiSettings = mGoogleMap.getUiSettings();
@@ -368,6 +402,20 @@ public class MapActivity extends AppCompatActivity
                 dialog.show(getSupportFragmentManager(), "InformationDialogFragment");
             }
         });
+    }
+
+    // TODO: restore all pins
+    private void restoreData() {
+        if (sRestoreData) {
+            final LatLng latLng = new LatLng(sLat, sLon);
+
+            mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, sZoom));
+                }
+            });
+        }
     }
 
 }

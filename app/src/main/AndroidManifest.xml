@@ -28,7 +28,6 @@
             android:required="false" />
 
         <activity
-            android:screenOrientation="portrait"
             android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,15 +37,12 @@
         </activity>
 
         <activity
-            android:screenOrientation="portrait"
             android:name=".activities.MapActivity" />
 
         <activity
-            android:screenOrientation="portrait"
             android:name=".activities.SearchActivity" />
 
         <activity
-            android:screenOrientation="portrait"
             android:name=".activities.AboutActivity" />
 
     </application>
