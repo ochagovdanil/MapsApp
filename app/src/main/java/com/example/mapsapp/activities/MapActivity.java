@@ -21,6 +21,8 @@ import com.example.mapsapp.R;
 import com.example.mapsapp.fragments.InformationDialogFragment;
 import com.example.mapsapp.fragments.PinEditDialogFragment;
 import com.example.mapsapp.models.EMaps;
+import com.example.mapsapp.models.Pin;
+import com.example.mapsapp.models.RestoreData;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +37,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity
                          implements OnMapReadyCallback {
@@ -57,8 +62,10 @@ public class MapActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
     private final LatLng mDefaultLocation = new LatLng(40.7143528, -74.0059731); // new york
+    private List<Pin> mListPins = new ArrayList<>();
+    private RestoreData mRestoreData = null;
 
-    private boolean mLocationPermissionGranted;
+    private boolean mLocationPermissionGranted = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +84,19 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.map, menu);
+
+        // restore the traffic
+        MenuItem menuItem = menu.findItem(R.id.item_menu_traffic);
+
+        if (mRestoreData != null) {
+            if (mRestoreData.getTraffic()) {
+                mGoogleMap.setTrafficEnabled(true);
+                menuItem.setChecked(true);
+            } else {
+                mGoogleMap.setTrafficEnabled(false);
+                menuItem.setChecked(false);
+            }
+        }
         return true;
     }
 
@@ -101,6 +121,8 @@ public class MapActivity extends AppCompatActivity
                 break;
             case R.id.item_menu_clean_map:
                 mGoogleMap.clear();
+                mListPins.clear();
+
                 Toast.makeText(
                         MapActivity.this,
                         "The map was cleaned!",
@@ -110,6 +132,29 @@ public class MapActivity extends AppCompatActivity
                 openOfficialApp();
         }
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // saving the last zoom, coordinates, pins and enabled traffic
+        double lat = mGoogleMap.getCameraPosition().target.latitude;
+        double lon = mGoogleMap.getCameraPosition().target.longitude;
+        float zoom = mGoogleMap.getCameraPosition().zoom;
+
+        RestoreData restoreData = new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled(), mListPins);
+        savedInstanceState.putParcelable("restore_data", restoreData);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            // get the last zoom, coordinates, pins and enabled traffic
+            mRestoreData = savedInstanceState.getParcelable("restore_data");
+        }
     }
 
     @Override
@@ -135,6 +180,7 @@ public class MapActivity extends AppCompatActivity
         getDeviceLocation();
 
         setTypeOfMap();
+        restoreData();
 
         // set the ui settings
         UiSettings uiSettings = mGoogleMap.getUiSettings();
@@ -143,25 +189,7 @@ public class MapActivity extends AppCompatActivity
 
         addPin();
         editPin();
-
-        mGoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                // show a new position
-                Toast.makeText(
-                        MapActivity.this,
-                        marker.getPosition().toString(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        movePin();
 
         showInformationAboutPlace();
     }
@@ -310,6 +338,11 @@ public class MapActivity extends AppCompatActivity
                         MapActivity.this,
                         marker.getPosition().toString(),
                         Toast.LENGTH_SHORT).show();
+
+                mListPins.add(new Pin(
+                        marker.getTitle(),
+                        latLng.latitude,
+                        latLng.longitude));
             }
         });
     }
@@ -329,9 +362,36 @@ public class MapActivity extends AppCompatActivity
                 dialog.setOnSavePinEditDialogListener(new PinEditDialogFragment.PinEditDialogListener() {
                     @Override
                     public void onSavePinEditDialogListener(String text) {
+                        updatePinTitleInList(
+                                text,
+                                marker.getTitle(),
+                                marker.getPosition().latitude,
+                                marker.getPosition().longitude);
+
                         marker.setTitle(text);
                     }
                 });
+            }
+        });
+    }
+
+    private void movePin() {
+        mGoogleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                // show a new position
+                Toast.makeText(
+                        MapActivity.this,
+                        marker.getPosition().toString(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -368,6 +428,45 @@ public class MapActivity extends AppCompatActivity
                 dialog.show(getSupportFragmentManager(), "InformationDialogFragment");
             }
         });
+    }
+
+    private void restoreData() {
+        if (mRestoreData != null) {
+            // restore zoom and coordinates
+            final LatLng latLng = new LatLng(mRestoreData.getLat(), mRestoreData.getLon());
+
+            mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    mGoogleMap.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(latLng, mRestoreData.getZoom()));
+                }
+            });
+
+            // restore pins
+            mListPins = mRestoreData.getListPins();
+
+            for (int i = 0; i < mListPins.size(); i++) {
+                mGoogleMap.addMarker(new MarkerOptions()
+                            .draggable(true)
+                            .title(mListPins.get(i).getTitle())
+                            .position(new LatLng(
+                                    mListPins.get(i).getLat(),
+                                    mListPins.get(i).getLon())));
+            }
+        }
+    }
+
+    private void updatePinTitleInList(String new_title, String old_title, double lat, double lon) {
+        for (int i = 0; i < mListPins.size(); i++) {
+            if (mListPins.get(i).getTitle().equals(old_title) &&
+                mListPins.get(i).getLat() == lat &&
+                mListPins.get(i).getLon() == lon)
+            {
+                mListPins.get(i).setTitle(new_title);
+                return;
+            }
+        }
     }
 
 }
