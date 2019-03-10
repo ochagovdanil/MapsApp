@@ -92,7 +92,12 @@ public class RestoreData implements Parcelable {
         dest.writeDouble(mLat);
         dest.writeDouble(mLon);
         dest.writeByte((byte) (mTraffic ? 1 : 0));
-        dest.writeList(mListPins);
+        // when user set a pin and go to the official app he gets en error in this line
+        try {
+            dest.writeList(mListPins);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
     
 }
