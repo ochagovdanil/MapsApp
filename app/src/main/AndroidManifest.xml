@@ -40,9 +40,6 @@
             android:name=".activities.MapActivity" />
 
         <activity
-            android:name=".activities.SearchActivity" />
-
-        <activity
             android:name=".activities.AboutActivity" />
 
     </application>
