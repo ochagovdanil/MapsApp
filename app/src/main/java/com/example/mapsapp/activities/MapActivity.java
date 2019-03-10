@@ -2,6 +2,8 @@ package com.example.mapsapp.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.mapsapp.R;
@@ -38,6 +41,7 @@ import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +59,6 @@ public class MapActivity extends AppCompatActivity
     private static final int SATELLITE_TYPE = EMaps.SATELLITE.getType();
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int REQUEST_CODE_SEARCH_PLACE = 1;
     private static final int DEFAULT_ZOOM = 15;
 
     private GoogleMap mGoogleMap;
@@ -64,6 +67,7 @@ public class MapActivity extends AppCompatActivity
     private final LatLng mDefaultLocation = new LatLng(40.7143528, -74.0059731); // new york
     private List<Pin> mListPins = new ArrayList<>();
     private RestoreData mRestoreData = null;
+    private SearchView mSearchView;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -75,6 +79,7 @@ public class MapActivity extends AppCompatActivity
         initToolbar();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        mSearchView = findViewById(R.id.search_view_places);
 
         SupportMapFragment supportMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -103,12 +108,6 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.item_menu_search:
-                // go to search
-                startActivityForResult(
-                        new Intent(MapActivity.this, SearchActivity.class),
-                        REQUEST_CODE_SEARCH_PLACE);
-                break;
             case R.id.item_menu_traffic:
                 // set the traffic
                 if (!item.isChecked()) {
@@ -141,7 +140,8 @@ public class MapActivity extends AppCompatActivity
         double lon = mGoogleMap.getCameraPosition().target.longitude;
         float zoom = mGoogleMap.getCameraPosition().zoom;
 
-        RestoreData restoreData = new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled(), mListPins);
+        RestoreData restoreData =
+                new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled(), mListPins);
         savedInstanceState.putParcelable("restore_data", restoreData);
 
         super.onSaveInstanceState(savedInstanceState);
@@ -154,20 +154,6 @@ public class MapActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             // get the last zoom, coordinates, pins and enabled traffic
             mRestoreData = savedInstanceState.getParcelable("restore_data");
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (data != null) {
-            // go to the searched place by an user
-            if ((requestCode == REQUEST_CODE_SEARCH_PLACE) && (resultCode == RESULT_OK)) {
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
-                        data.getDoubleExtra("place_lat", 0),
-                        data.getDoubleExtra("place_long", 0))));
-            }
         }
     }
 
@@ -186,6 +172,8 @@ public class MapActivity extends AppCompatActivity
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(true);
+
+        makeSearch();
 
         addPin();
         editPin();
@@ -467,6 +455,44 @@ public class MapActivity extends AppCompatActivity
                 return;
             }
         }
+    }
+
+    private void makeSearch() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (!query.equals("")) {
+                    try {
+                        Geocoder geocoder = new Geocoder(MapActivity.this);
+                        List<Address> listAddress = geocoder.getFromLocationName(query, 1);
+
+                        if (listAddress.size() > 0) {
+                            Address address = listAddress.get(0);
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
+                                    address.getLatitude(),
+                                    address.getLongitude())));
+                        } else {
+                            InformationDialogFragment dialog = new InformationDialogFragment();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("map_place_info", getString(R.string.search_fail));
+                            dialog.setArguments(bundle);
+                            dialog.show(getSupportFragmentManager(),
+                                    "InformationDialogFragment");
+                        }
+
+                        return true;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
 }
