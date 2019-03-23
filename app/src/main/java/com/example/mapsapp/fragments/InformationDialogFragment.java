@@ -15,7 +15,7 @@ public class InformationDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        String message = getArguments().getString("map_place_info");
+        String message = getArguments().getString("msg");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(true)
