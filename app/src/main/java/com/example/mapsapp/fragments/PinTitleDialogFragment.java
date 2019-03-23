@@ -13,9 +13,9 @@ import android.widget.LinearLayout;
 
 import com.example.mapsapp.R;
 
-public class PinEditDialogFragment extends DialogFragment {
+public class PinTitleDialogFragment extends DialogFragment {
 
-    private PinEditDialogListener mPinEditDialogListener;
+    private PinTitleDialogListener mPinTitleDialogListener;
 
     @NonNull
     @Override
@@ -25,33 +25,26 @@ public class PinEditDialogFragment extends DialogFragment {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         editText.setLayoutParams(layoutParams);
-        editText.setText(getArguments().getString("marker_title", "New marker"));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Change the title")
+        builder.setTitle("Set a new title")
                 .setCancelable(false)
                 .setView(editText)
                 .setPositiveButton(R.string.dialog_save, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mPinEditDialogListener.onSavePinEditDialogListener(editText.getText().toString());
-                    }
-                })
-                .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                        mPinTitleDialogListener.onSavePinTitleDialogListener(editText.getText().toString());
                     }
                 });
         return builder.create();
     }
 
-    public void setOnSavePinEditDialogListener(PinEditDialogListener pinEditDialogListener) {
-        mPinEditDialogListener = pinEditDialogListener;
+    public void setOnSavePinTitleDialogListener(PinTitleDialogListener pinTitleDialogListener) {
+        mPinTitleDialogListener = pinTitleDialogListener;
     }
 
-    public interface PinEditDialogListener {
-        void onSavePinEditDialogListener(String text);
+    public interface PinTitleDialogListener {
+        void onSavePinTitleDialogListener(String text);
     }
 
 }

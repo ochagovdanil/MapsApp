@@ -1,7 +1,10 @@
 package com.example.mapsapp.activities;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +27,9 @@ import android.widget.Toast;
 import com.example.mapsapp.R;
 import com.example.mapsapp.fragments.InformationDialogFragment;
 import com.example.mapsapp.fragments.PinEditDialogFragment;
+import com.example.mapsapp.fragments.PinTitleDialogFragment;
+import com.example.mapsapp.helpers.DBHelper;
 import com.example.mapsapp.models.EMaps;
-import com.example.mapsapp.models.Pin;
 import com.example.mapsapp.models.RestoreData;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -42,7 +47,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity
@@ -65,9 +69,11 @@ public class MapActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
     private final LatLng mDefaultLocation = new LatLng(40.7143528, -74.0059731); // new york
-    private List<Pin> mListPins = new ArrayList<>();
-    private RestoreData mRestoreData = null;
+    private RestoreData mRestoreData = null; // the parcelable object
     private SearchView mSearchView;
+
+    private DBHelper mDbHelper;
+    private SQLiteDatabase mDatabase;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -78,12 +84,21 @@ public class MapActivity extends AppCompatActivity
 
         initToolbar();
 
+        mDbHelper = new DBHelper(MapActivity.this);
+        mDatabase = mDbHelper.getWritableDatabase();
+
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         mSearchView = findViewById(R.id.search_view_places);
 
         SupportMapFragment supportMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         supportMapFragment.getMapAsync(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDbHelper.close();
     }
 
     @Override
@@ -120,7 +135,7 @@ public class MapActivity extends AppCompatActivity
                 break;
             case R.id.item_menu_clean_map:
                 mGoogleMap.clear();
-                mListPins.clear();
+                mDatabase.delete("maps", null, null);
 
                 Toast.makeText(
                         MapActivity.this,
@@ -141,7 +156,7 @@ public class MapActivity extends AppCompatActivity
         float zoom = mGoogleMap.getCameraPosition().zoom;
 
         RestoreData restoreData =
-                new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled(), mListPins);
+                new RestoreData(zoom, lat, lon, mGoogleMap.isTrafficEnabled());
         savedInstanceState.putParcelable("restore_data", restoreData);
 
         super.onSaveInstanceState(savedInstanceState);
@@ -166,7 +181,8 @@ public class MapActivity extends AppCompatActivity
         getDeviceLocation();
 
         setTypeOfMap();
-        restoreData();
+        restoreData(); // it's used after the screen rotation
+        restoreAllMarkers();
 
         // set the ui settings
         UiSettings uiSettings = mGoogleMap.getUiSettings();
@@ -315,22 +331,46 @@ public class MapActivity extends AppCompatActivity
     private void addPin() {
         mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
-                Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-                        .draggable(true)
-                        .position(latLng)
-                        .title("New marker"));
-                marker.showInfoWindow();
+            public void onMapLongClick(final LatLng latLng) {
+                // set a title before creating
+                PinTitleDialogFragment dialog = new PinTitleDialogFragment();
+                dialog.show(getSupportFragmentManager(), "PinTitleDialogFragment");
+                dialog.setOnSavePinTitleDialogListener(
+                        new PinTitleDialogFragment.PinTitleDialogListener() {
+                    @Override
+                    public void onSavePinTitleDialogListener(String text) {
+                        if (!text.equals("")) {
+                            if (titleExists(text)) {
+                                showInformationDialog(getString(R.string.same_result));
+                            } else {
+                                // add the marker at the map
+                                Marker marker = mGoogleMap.addMarker(new MarkerOptions()
+                                        .draggable(true)
+                                        .position(latLng)
+                                        .title(text));
+                                marker.showInfoWindow();
 
-                Toast.makeText(
-                        MapActivity.this,
-                        marker.getPosition().toString(),
-                        Toast.LENGTH_SHORT).show();
+                                // add the marker into the database
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put("title", marker.getTitle());
+                                contentValues.put("lat", marker.getPosition().latitude);
+                                contentValues.put("lon", marker.getPosition().longitude);
+                                mDatabase.insert("maps", null, contentValues);
 
-                mListPins.add(new Pin(
-                        marker.getTitle(),
-                        latLng.latitude,
-                        latLng.longitude));
+                                // show a position of a new marker
+                                Toast toast = Toast.makeText(
+                                        MapActivity.this,
+                                        marker.getPosition().toString(),
+                                        Toast.LENGTH_SHORT);
+                                toast.setGravity(
+                                        Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL,
+                                        0,
+                                        50);
+                                toast.show();
+                            }
+                        }
+                    }
+                });
             }
         });
     }
@@ -347,16 +387,30 @@ public class MapActivity extends AppCompatActivity
 
                 dialog.show(getSupportFragmentManager(), "PinEditDialogFragment");
 
-                dialog.setOnSavePinEditDialogListener(new PinEditDialogFragment.PinEditDialogListener() {
+                dialog.setOnSavePinEditDialogListener
+                        (new PinEditDialogFragment.PinEditDialogListener() {
                     @Override
                     public void onSavePinEditDialogListener(String text) {
-                        updatePinTitleInList(
-                                text,
-                                marker.getTitle(),
-                                marker.getPosition().latitude,
-                                marker.getPosition().longitude);
+                        if (titleExists(text)) {
+                            showInformationDialog(getString(R.string.same_result));
+                        } else {
+                            // update at the database
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put("title", text);
+                            contentValues.put("lat", marker.getPosition().latitude);
+                            contentValues.put("lon", marker.getPosition().longitude);
 
-                        marker.setTitle(text);
+                            mDatabase.update("maps",
+                                    contentValues,
+                                    "title = ? and lat = ? and lon = ?",
+                                    new String[]{
+                                            marker.getTitle(),
+                                            String.valueOf(marker.getPosition().latitude),
+                                            String.valueOf(marker.getPosition().longitude)});
+
+                            // update at the map
+                            marker.setTitle(text);
+                        }
                     }
                 });
             }
@@ -375,7 +429,17 @@ public class MapActivity extends AppCompatActivity
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
-                // show a new position
+                // update the database
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("title", marker.getTitle());
+                contentValues.put("lat", marker.getPosition().latitude);
+                contentValues.put("lon", marker.getPosition().longitude);
+                mDatabase.update(
+                        "maps",
+                        contentValues,
+                        "title = ?",
+                        new String[]{marker.getTitle()});
+
                 Toast.makeText(
                         MapActivity.this,
                         marker.getPosition().toString(),
@@ -403,17 +467,12 @@ public class MapActivity extends AppCompatActivity
         mGoogleMap.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
             @Override
             public void onPoiClick(PointOfInterest pointOfInterest) {
-                String msg = "Id: " + pointOfInterest.placeId +
+                String msg =
+                        "Id: " + pointOfInterest.placeId +
                         "\nName: " + pointOfInterest.name +
                         "\nCoordinates: " + pointOfInterest.latLng.latitude +
                         ", " + pointOfInterest.latLng.longitude;
-
-                Bundle bundle = new Bundle();
-                bundle.putString("map_place_info", msg);
-
-                InformationDialogFragment dialog = new InformationDialogFragment();
-                dialog.setArguments(bundle);
-                dialog.show(getSupportFragmentManager(), "InformationDialogFragment");
+                showInformationDialog(msg);
             }
         });
     }
@@ -430,31 +489,24 @@ public class MapActivity extends AppCompatActivity
                             CameraUpdateFactory.newLatLngZoom(latLng, mRestoreData.getZoom()));
                 }
             });
-
-            // restore pins
-            mListPins = mRestoreData.getListPins();
-
-            for (int i = 0; i < mListPins.size(); i++) {
-                mGoogleMap.addMarker(new MarkerOptions()
-                            .draggable(true)
-                            .title(mListPins.get(i).getTitle())
-                            .position(new LatLng(
-                                    mListPins.get(i).getLat(),
-                                    mListPins.get(i).getLon())));
-            }
         }
     }
 
-    private void updatePinTitleInList(String new_title, String old_title, double lat, double lon) {
-        for (int i = 0; i < mListPins.size(); i++) {
-            if (mListPins.get(i).getTitle().equals(old_title) &&
-                mListPins.get(i).getLat() == lat &&
-                mListPins.get(i).getLon() == lon)
-            {
-                mListPins.get(i).setTitle(new_title);
-                return;
-            }
+    private void restoreAllMarkers() {
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM maps", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .title(cursor.getString(cursor.getColumnIndex("title")))
+                        .position(new LatLng(
+                                cursor.getDouble(cursor.getColumnIndex("lat")),
+                                cursor.getDouble(cursor.getColumnIndex("lon"))))
+                        .draggable(true));
+            } while (cursor.moveToNext());
         }
+
+        cursor.close();
     }
 
     private void makeSearch() {
@@ -472,12 +524,7 @@ public class MapActivity extends AppCompatActivity
                                     address.getLatitude(),
                                     address.getLongitude())));
                         } else {
-                            InformationDialogFragment dialog = new InformationDialogFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putString("map_place_info", getString(R.string.search_fail));
-                            dialog.setArguments(bundle);
-                            dialog.show(getSupportFragmentManager(),
-                                    "InformationDialogFragment");
+                            showInformationDialog(getString(R.string.search_fail));
                         }
 
                         return true;
@@ -493,6 +540,29 @@ public class MapActivity extends AppCompatActivity
                 return false;
             }
         });
+    }
+
+    private boolean titleExists(String title) {
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM maps", null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(cursor.getColumnIndex("title")).equals(title)) {
+                    return true;
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return false;
+    }
+
+    private void showInformationDialog(String message) {
+        Bundle bundle = new Bundle();
+        bundle.putString("msg", message);
+
+        InformationDialogFragment dialog = new InformationDialogFragment();
+        dialog.setArguments(bundle);
+        dialog.show(getSupportFragmentManager(), "InformationDialogFragment");
     }
 
 }

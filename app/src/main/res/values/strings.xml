@@ -16,5 +16,6 @@
     <string name="about">About</string>
     <string name="dialog_ok">OK</string>
     <string name="search_fail">Sorry, we found no results!</string>
+    <string name="same_result">A marker with the same title already exists!</string>
 
 </resources>
