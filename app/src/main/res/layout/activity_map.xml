@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -13,10 +14,20 @@
             android:id="@+id/search_view_places"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
+        <TextView
+            android:id="@+id/text_bad_connection"
+            android:textColor="@color/colorWhite"
+            android:layout_below="@id/search_view_places"
+            android:visibility="gone"
+            android:padding="2dp"
+            android:gravity="center"
+            android:background="@color/colorRed"
+            android:text="@string/bad_connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
         <fragment
             android:id="@+id/map"
-            android:layout_below="@id/search_view_places"
+            android:layout_below="@id/text_bad_connection"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
