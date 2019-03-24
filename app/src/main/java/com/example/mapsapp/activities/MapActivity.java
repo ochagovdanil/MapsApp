@@ -1,6 +1,7 @@
 package com.example.mapsapp.activities;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -8,8 +9,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.AnimRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,7 +26,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mapsapp.R;
@@ -71,9 +79,12 @@ public class MapActivity extends AppCompatActivity
     private final LatLng mDefaultLocation = new LatLng(40.7143528, -74.0059731); // new york
     private RestoreData mRestoreData = null; // the parcelable object
     private SearchView mSearchView;
+    private Handler mHandler = new Handler();
 
     private DBHelper mDbHelper;
     private SQLiteDatabase mDatabase;
+
+    private TextView mTextConnection;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -83,6 +94,9 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
 
         initToolbar();
+
+        mTextConnection = findViewById(R.id.text_bad_connection);
+        mHandler.post(internetConnection);
 
         mDbHelper = new DBHelper(MapActivity.this);
         mDatabase = mDbHelper.getWritableDatabase();
@@ -98,6 +112,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mHandler.removeCallbacks(internetConnection);
         mDbHelper.close();
     }
 
@@ -563,6 +578,42 @@ public class MapActivity extends AppCompatActivity
         InformationDialogFragment dialog = new InformationDialogFragment();
         dialog.setArguments(bundle);
         dialog.show(getSupportFragmentManager(), "InformationDialogFragment");
+    }
+
+    Runnable internetConnection = new Runnable() {
+        @Override
+        public void run() {
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+                hideBadConnectionBlock();
+            } else {
+                showBadConnectionBlock();
+            }
+
+            mHandler.postDelayed(this, 1500);
+        }
+    };
+
+    private void hideBadConnectionBlock() {
+        if (mTextConnection.getVisibility() == View.VISIBLE) {
+            playAnimationMotion(R.anim.translate_top);
+            mTextConnection.setVisibility(View.GONE);
+        }
+    }
+
+    private void showBadConnectionBlock() {
+        if (mTextConnection.getVisibility() == View.GONE) {
+            playAnimationMotion(R.anim.translate_bottom);
+            mTextConnection.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void playAnimationMotion(@AnimRes int anim) {
+        Animation animation = AnimationUtils.loadAnimation(MapActivity.this, anim);
+        mTextConnection.startAnimation(animation);
     }
 
 }
