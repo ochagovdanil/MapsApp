@@ -4,7 +4,7 @@
     <string name="button_get_started">Get started</string>
     <string name="text_select_type">Select a type of a map</string>
     <string name="item_menu_about">About</string>
-    <string name="item_menu_off_app">Ope in the official app</string>
+    <string name="item_menu_off_app">Open in the official app</string>
     <string name="item_menu_exit">Exit</string>
     <string name="map">Viewing</string>
     <string name="item_menu_traffic">Show the traffic</string>
