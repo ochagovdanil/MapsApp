@@ -191,9 +191,10 @@ public class MapActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
 
-        getLocationPermission();
-        updateLocationUI();
-        getDeviceLocation();
+        // get a current locations of an user
+        ActivityCompat.requestPermissions(this,
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
 
         setTypeOfMap();
         restoreData(); // it's used after the screen rotation
@@ -217,17 +218,12 @@ public class MapActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
+            mLocationPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
 
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
-            }
+            updateLocationUI();
+            getDeviceLocation();
         }
-
-        updateLocationUI();
     }
 
     private void initToolbar() {
@@ -283,18 +279,6 @@ public class MapActivity extends AppCompatActivity
         }
         if (type == SATELLITE_TYPE) {
             mGoogleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        }
-    }
-
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
