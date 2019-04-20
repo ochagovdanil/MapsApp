@@ -18,7 +18,6 @@ import android.support.annotation.AnimRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -522,6 +522,8 @@ public class MapActivity extends AppCompatActivity
                             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
                                     address.getLatitude(),
                                     address.getLongitude())));
+
+                            hideKeyboard(mSearchView);
                         } else {
                             showInformationDialog(getString(R.string.search_fail));
                         }
@@ -598,6 +600,14 @@ public class MapActivity extends AppCompatActivity
     private void playAnimationMotion(@AnimRes int anim) {
         Animation animation = AnimationUtils.loadAnimation(MapActivity.this, anim);
         mTextConnection.startAnimation(animation);
+    }
+
+    public void hideKeyboard(SearchView editText) {
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        }
     }
 
 }
