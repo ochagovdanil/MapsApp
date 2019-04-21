@@ -14,7 +14,7 @@ _Maps App - an application where you can select a map and use it. The applicatio
  * Name - Maps App
  * Android 5.0(API 21) or higher
  * Version of the app - 1.0
- * Size - 8 MB
+ * Apk size - 29.3 MB
  * Developer - Danil Ochagov [(ochagovdanil)](https://github.com/ochagovdanil)
 
 # Getting Started
