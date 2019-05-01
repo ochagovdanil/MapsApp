@@ -19,6 +19,17 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
 
         initToolbar();
+
+        // go to the github's page
+        TextView textPage = findViewById(R.id.text_open_github_about);
+        textPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/ochagovdanil/MapsApp")));
+            }
+        });
     }
 
     private void initToolbar() {
@@ -31,17 +42,6 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-            }
-        });
-
-        // go to the github's page
-        TextView textPage = findViewById(R.id.text_open_github_about);
-        textPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/ochagovdanil/MapsApp")));
             }
         });
     }
