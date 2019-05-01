@@ -602,7 +602,7 @@ public class MapActivity extends AppCompatActivity
         mTextConnection.startAnimation(animation);
     }
 
-    public void hideKeyboard(SearchView editText) {
+    private void hideKeyboard(SearchView editText) {
         InputMethodManager imm =
                 (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
