@@ -7,17 +7,30 @@
 
     <include layout="@layout/toolbar" />
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <SearchView
-            android:id="@+id/search_view_places"
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="17dp"
+            android:layout_marginRight="17dp"
+            android:background="@drawable/search_bar_background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <SearchView
+                android:id="@+id/search_view_places"
+                android:padding="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
         <TextView
             android:id="@+id/text_bad_connection"
             android:textColor="@color/colorWhite"
-            android:layout_below="@id/search_view_places"
             android:visibility="gone"
             android:padding="2dp"
             android:gravity="center"
@@ -25,12 +38,6 @@
             android:text="@string/bad_connection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-        <fragment
-            android:id="@+id/map"
-            android:layout_below="@id/text_bad_connection"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </RelativeLayout>
+    </FrameLayout>
 
 </LinearLayout>
