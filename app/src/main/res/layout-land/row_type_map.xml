@@ -12,15 +12,21 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ImageView
-            android:id="@+id/image_row_type_map"
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_image_round"
+            app:cardCornerRadius="15dp"
             android:layout_margin="15dp"
-            android:scaleType="center"
             android:layout_width="match_parent"
-            android:layout_height="250dp" />
+            android:layout_height="250dp">
+            <ImageView
+                android:id="@+id/image_row_type_map"
+                android:scaleType="center"
+                android:layout_width="match_parent"
+                android:layout_height="250dp" />
+        </android.support.v7.widget.CardView>
         <TextView
             android:id="@+id/text_row_type_map"
-            android:layout_below="@id/image_row_type_map"
+            android:layout_below="@id/card_image_round"
             android:layout_marginBottom="10dp"
             android:layout_centerHorizontal="true"
             android:textColor="@color/colorDark"
