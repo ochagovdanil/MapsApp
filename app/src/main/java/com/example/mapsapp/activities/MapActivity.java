@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +44,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -86,6 +86,7 @@ public class MapActivity extends AppCompatActivity
     private SQLiteDatabase mDatabase;
 
     private TextView mTextConnection;
+    private ImageView mBtnLocation, mBtnZoomIn, mBtnZoomOut;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -95,6 +96,10 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
 
         initToolbar();
+
+        mBtnLocation = findViewById(R.id.button_map_location);
+        mBtnZoomIn = findViewById(R.id.button_map_zoom_in);
+        mBtnZoomOut = findViewById(R.id.button_map_zoom_out);
 
         mTextConnection = findViewById(R.id.text_bad_connection);
         mHandler.post(internetConnection);
@@ -204,11 +209,12 @@ public class MapActivity extends AppCompatActivity
         // set the ui settings
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setMapToolbarEnabled(false);
-        uiSettings.setZoomControlsEnabled(true);
-        mGoogleMap.setPadding(0, 200, 0, 0); // to show the search bar
+        uiSettings.setZoomControlsEnabled(false);
+        uiSettings.setCompassEnabled(false);
+        uiSettings.setMyLocationButtonEnabled(false);
 
+        overrideMapButtonsControl();
         makeSearch();
-
         addPin();
         editPin();
         movePin();
@@ -218,7 +224,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
+                                           @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             mLocationPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
@@ -290,11 +296,11 @@ public class MapActivity extends AppCompatActivity
         try {
             if (mLocationPermissionGranted) {
                 mGoogleMap.setMyLocationEnabled(true);
-                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mBtnLocation.setVisibility(View.VISIBLE);
             } else {
                 mGoogleMap.setMyLocationEnabled(false);
-                mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
+                mBtnLocation.setVisibility(View.GONE);
             }
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
@@ -311,7 +317,7 @@ public class MapActivity extends AppCompatActivity
                         if (task.isSuccessful()) {
                             // move the camera and save a last know location
                             mLastKnownLocation = task.getResult();
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(
                                             mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()),
@@ -327,6 +333,42 @@ public class MapActivity extends AppCompatActivity
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    // override location, zoom in and zoom out buttons of the map
+    private void overrideMapButtonsControl() {
+        mBtnLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                if (mLocationPermissionGranted) {
+                    // go to your location
+                    updateLocationUI();
+                    getDeviceLocation();
+                }
+            }
+        });
+        mBtnZoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                // zoom in
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(
+                                mGoogleMap.getCameraPosition().target.latitude,
+                                mGoogleMap.getCameraPosition().target.longitude),
+                        mGoogleMap.getCameraPosition().zoom + 0.65f));
+            }
+        });
+        mBtnZoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                // zoom out
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(
+                                mGoogleMap.getCameraPosition().target.latitude,
+                                mGoogleMap.getCameraPosition().target.longitude),
+                        mGoogleMap.getCameraPosition().zoom - 0.65f));
+            }
+        });
     }
 
     private void addPin() {
