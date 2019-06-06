@@ -7,30 +7,74 @@
 
     <include layout="@layout/toolbar" />
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <SearchView
-            android:id="@+id/search_view_places"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/text_bad_connection"
-            android:textColor="@color/colorWhite"
-            android:layout_below="@id/search_view_places"
-            android:visibility="gone"
-            android:padding="2dp"
-            android:gravity="center"
-            android:background="@color/colorRed"
-            android:text="@string/bad_connection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
         <fragment
             android:id="@+id/map"
-            android:layout_below="@id/text_bad_connection"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_marginTop="12dp"
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="17dp"
+                android:background="@drawable/search_bar_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <SearchView
+                    android:id="@+id/search_view_places"
+                    android:padding="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/button_map_location"
+                    android:background="@drawable/map_button_background"
+                    android:src="@drawable/ic_location"
+                    android:padding="13dp"
+                    android:layout_margin="5dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+                <ImageView
+                    android:id="@+id/button_map_zoom_in"
+                    android:src="@drawable/ic_zoom_in"
+                    android:background="@drawable/map_button_background"
+                    android:padding="13dp"
+                    android:layout_margin="5dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+                <ImageView
+                    android:id="@+id/button_map_zoom_out"
+                    android:src="@drawable/ic_zoom_out"
+                    android:background="@drawable/map_button_background"
+                    android:padding="13dp"
+                    android:layout_margin="5dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/text_bad_connection"
+                android:textColor="@color/colorWhite"
+                android:visibility="gone"
+                android:padding="2dp"
+                android:gravity="center"
+                android:background="@color/colorRed"
+                android:text="@string/bad_connection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </FrameLayout>
 
 </LinearLayout>
