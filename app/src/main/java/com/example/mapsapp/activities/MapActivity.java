@@ -563,7 +563,7 @@ public class MapActivity extends AppCompatActivity
 
                         if (listAddress.size() > 0) {
                             Address address = listAddress.get(0);
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
+                            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(
                                     address.getLatitude(),
                                     address.getLongitude())));
 
