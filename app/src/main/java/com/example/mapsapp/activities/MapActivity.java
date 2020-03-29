@@ -14,12 +14,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.AnimRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -28,10 +22,15 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.AnimRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.mapsapp.R;
 import com.example.mapsapp.fragments.InformationDialogFragment;
@@ -54,6 +53,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.List;
@@ -86,7 +86,7 @@ public class MapActivity extends AppCompatActivity
     private SQLiteDatabase mDatabase;
 
     private TextView mTextConnection;
-    private ImageView mBtnLocation, mBtnZoomIn, mBtnZoomOut;
+    private FloatingActionButton mBtnLocation, mBtnZoomIn, mBtnZoomOut;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -94,8 +94,6 @@ public class MapActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-        initToolbar();
 
         mBtnLocation = findViewById(R.id.button_map_location);
         mBtnZoomIn = findViewById(R.id.button_map_zoom_in);
@@ -118,6 +116,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         mHandler.removeCallbacks(internetConnection);
         mDbHelper.close();
     }
@@ -138,6 +137,7 @@ public class MapActivity extends AppCompatActivity
                 menuItem.setChecked(false);
             }
         }
+
         return true;
     }
 
@@ -165,7 +165,11 @@ public class MapActivity extends AppCompatActivity
                 break;
             case R.id.item_menu_off_app:
                 openOfficialApp();
+                break;
+            case android.R.id.home: // back button of parent activity name
+                finish();
         }
+
         return true;
     }
 
@@ -232,20 +236,6 @@ public class MapActivity extends AppCompatActivity
             updateLocationUI();
             getDeviceLocation();
         }
-    }
-
-    private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar_my);
-        toolbar.setNavigationIcon(R.drawable.ic_menu_back);
-        toolbar.setTitle(R.string.map);
-        setSupportActionBar(toolbar);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
     private void setTypeOfMap() {

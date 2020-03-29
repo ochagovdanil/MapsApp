@@ -7,7 +7,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initToolbar();
         initListOfMaps();
     }
 
@@ -43,12 +41,6 @@ public class MainActivity extends AppCompatActivity {
                 finish();
         }
         return true;
-    }
-
-    private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar_my);
-        toolbar.setTitle(R.string.app_name);
-        setSupportActionBar(toolbar);
     }
 
     private void initListOfMaps() {

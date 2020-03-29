@@ -3,11 +3,10 @@ package com.example.mapsapp.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.view.View;
-import android.widget.TextView;
 
 import com.example.mapsapp.R;
 
@@ -18,11 +17,11 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        initToolbar();
+        openGithubPage();
+    }
 
-        // go to the github's page
-        TextView textPage = findViewById(R.id.text_open_github_about);
-        textPage.setOnClickListener(new View.OnClickListener() {
+    private void openGithubPage() {
+        findViewById(R.id.text_open_github_about).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(
@@ -31,19 +30,4 @@ public class AboutActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar_my);
-        toolbar.setTitle(R.string.about);
-        toolbar.setNavigationIcon(R.drawable.ic_menu_back);
-        setSupportActionBar(toolbar);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-    }
-
 }

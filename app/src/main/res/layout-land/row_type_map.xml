@@ -1,37 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="10dp"
-    app:cardCornerRadius="15dp"
-    app:cardBackgroundColor="@color/colorWhite"
     android:id="@+id/card_row_view_map"
-    android:layout_width="match_parent"
+    android:layout_margin="10dp"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_image_round"
-            app:cardCornerRadius="15dp"
             android:layout_margin="15dp"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="250dp">
             <ImageView
                 android:id="@+id/image_row_type_map"
                 android:scaleType="center"
                 android:layout_width="match_parent"
                 android:layout_height="250dp" />
-        </androidx.cardview.widget.CardView>
-        <TextView
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_row_type_map"
             android:layout_below="@id/card_image_round"
             android:layout_marginBottom="10dp"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorDark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </RelativeLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
