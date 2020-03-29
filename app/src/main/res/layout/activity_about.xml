@@ -15,7 +15,7 @@
             android:id="@+id/image_about"
             android:layout_above="@+id/linear_layout_titles_about"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_launcher_app"
+            android:src="@mipmap/ic_launcher"
             android:layout_width="100dp"
             android:layout_height="100dp" />
         <LinearLayout
