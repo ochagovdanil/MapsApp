@@ -46,6 +46,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -86,7 +87,7 @@ public class MapActivity extends AppCompatActivity
     private SQLiteDatabase mDatabase;
 
     private TextView mTextConnection;
-    private FloatingActionButton mBtnLocation, mBtnZoomIn, mBtnZoomOut;
+    private FloatingActionButton mBtnLocation, mBtnCompass, mBtnZoomIn, mBtnZoomOut;
 
     private boolean mLocationPermissionGranted = false;
 
@@ -96,6 +97,7 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
 
         mBtnLocation = findViewById(R.id.button_map_location);
+        mBtnCompass = findViewById(R.id.button_map_compass);
         mBtnZoomIn = findViewById(R.id.button_map_zoom_in);
         mBtnZoomOut = findViewById(R.id.button_map_zoom_out);
 
@@ -335,6 +337,19 @@ public class MapActivity extends AppCompatActivity
                     updateLocationUI();
                     getDeviceLocation();
                 }
+            }
+        });
+        mBtnCompass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .bearing(0)
+                                .tilt(0)
+                                .target(new LatLng(
+                                        mGoogleMap.getCameraPosition().target.latitude,
+                                        mGoogleMap.getCameraPosition().target.longitude))
+                                .zoom(mGoogleMap.getCameraPosition().zoom).build()));
             }
         });
         mBtnZoomIn.setOnClickListener(new View.OnClickListener() {

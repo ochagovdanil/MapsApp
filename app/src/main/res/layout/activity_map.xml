@@ -31,13 +31,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_map_location"
-                android:src="@drawable/ic_location"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorWhite" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/button_map_zoom_in"
                 android:src="@drawable/ic_zoom_in"
                 android:layout_margin="5dp"
@@ -47,6 +40,28 @@
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/button_map_zoom_out"
                 android:src="@drawable/ic_zoom_out"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/colorWhite" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_map_location"
+                android:src="@drawable/ic_location"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/colorWhite" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_map_compass"
+                android:src="@drawable/ic_compass"
                 android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
