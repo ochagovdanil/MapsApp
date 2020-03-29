@@ -2,17 +2,18 @@ package com.example.mapsapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.mapsapp.models.EMaps;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.mapsapp.R;
 import com.example.mapsapp.adapters.MapTypeRecyclerViewAdapter;
+import com.example.mapsapp.models.EMaps;
 import com.example.mapsapp.models.MapType;
 
 public class MainActivity extends AppCompatActivity {
