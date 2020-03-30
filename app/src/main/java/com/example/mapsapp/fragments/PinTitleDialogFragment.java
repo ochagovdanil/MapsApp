@@ -1,17 +1,18 @@
 package com.example.mapsapp.fragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
 import com.example.mapsapp.R;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class PinTitleDialogFragment extends DialogFragment {
 
@@ -26,7 +27,7 @@ public class PinTitleDialogFragment extends DialogFragment {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         editText.setLayoutParams(layoutParams);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
         builder.setTitle("Set a new title")
                 .setCancelable(false)
                 .setView(editText)
