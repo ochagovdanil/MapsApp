@@ -17,5 +17,6 @@
     <string name="search_fail">Sorry, we found no results!</string>
     <string name="same_result">A marker with the same title already exists!</string>
     <string name="bad_connection">The Internet connection has been lost!</string>
+    <string name="maps_not_installed">You need to install Maps on your device!</string>
 
 </resources>

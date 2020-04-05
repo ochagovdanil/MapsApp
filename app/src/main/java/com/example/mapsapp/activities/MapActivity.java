@@ -506,8 +506,11 @@ public class MapActivity extends AppCompatActivity
         Uri uri = Uri.parse("geo:" + lat + "," + lon + "?z=" + zoom);
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, uri);
         mapIntent.setPackage("com.google.android.apps.maps");
+
         if (mapIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(mapIntent);
+        } else {
+            showInformationDialog(getString(R.string.maps_not_installed));
         }
     }
 
