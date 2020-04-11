@@ -8,20 +8,24 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.mapsapp.R;
+import com.example.mapsapp.databinding.ActivityAboutBinding;
 
 public class AboutActivity extends AppCompatActivity {
+
+    private ActivityAboutBinding mBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+
+        mBinding = ActivityAboutBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
         openGithubPage();
     }
 
     private void openGithubPage() {
-        findViewById(R.id.text_open_github_about).setOnClickListener(new View.OnClickListener() {
+        mBinding.textOpenGithubAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(

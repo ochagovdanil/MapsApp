@@ -12,15 +12,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsapp.R;
 import com.example.mapsapp.adapters.MapTypeRecyclerViewAdapter;
+import com.example.mapsapp.databinding.ActivityMainBinding;
 import com.example.mapsapp.models.EMaps;
 import com.example.mapsapp.models.MapType;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ActivityMainBinding mBinding;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
         initListOfMaps();
     }
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initListOfMaps() {
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_type_map);
+        RecyclerView recyclerView = mBinding.recyclerViewTypeMap;
         MapTypeRecyclerViewAdapter adapter =
                 new MapTypeRecyclerViewAdapter(MainActivity.this);
 

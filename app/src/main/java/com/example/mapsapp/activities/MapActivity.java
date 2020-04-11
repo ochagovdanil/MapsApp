@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.mapsapp.R;
+import com.example.mapsapp.databinding.ActivityMapBinding;
 import com.example.mapsapp.fragments.InformationDialogFragment;
 import com.example.mapsapp.fragments.PinEditDialogFragment;
 import com.example.mapsapp.fragments.PinTitleDialogFragment;
@@ -89,26 +90,30 @@ public class MapActivity extends AppCompatActivity
     private TextView mTextConnection;
     private FloatingActionButton mBtnLocation, mBtnCompass, mBtnZoomIn, mBtnZoomOut;
 
+    private ActivityMapBinding mBinding;
+
     private boolean mLocationPermissionGranted = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
 
-        mBtnLocation = findViewById(R.id.button_map_location);
-        mBtnCompass = findViewById(R.id.button_map_compass);
-        mBtnZoomIn = findViewById(R.id.button_map_zoom_in);
-        mBtnZoomOut = findViewById(R.id.button_map_zoom_out);
+        mBinding = ActivityMapBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        mTextConnection = findViewById(R.id.text_bad_connection);
+        mBtnLocation = mBinding.buttonMapLocation;
+        mBtnCompass = mBinding.buttonMapCompass;
+        mBtnZoomIn = mBinding.buttonMapZoomIn;
+        mBtnZoomOut = mBinding.buttonMapZoomOut;
+
+        mTextConnection = mBinding.textBadConnection;
         mHandler.post(internetConnection);
 
         mDbHelper = new DBHelper(MapActivity.this);
         mDatabase = mDbHelper.getWritableDatabase();
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        mSearchView = findViewById(R.id.search_view_places);
+        mSearchView = mBinding.searchViewPlaces;
 
         SupportMapFragment supportMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
