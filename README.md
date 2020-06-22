@@ -9,8 +9,6 @@ _Here is it_
   <img src="screenshots/screenshot_5.png" width="350px" />
 </div> <br />
 
-_MapsApp - an app where you can select a map and use it. The application contains some types of the styling maps._
-
  * Name - Maps App
  * Android 5.0(API 21) or higher
  * Version of the app - 1.0
