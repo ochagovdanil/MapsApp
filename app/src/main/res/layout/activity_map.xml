@@ -8,74 +8,81 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
-            android:layout_marginTop="12dp"
-            android:layout_marginLeft="17dp"
-            android:layout_marginRight="17dp"
-            android:background="@drawable/search_bar_background"
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="17dp"
+            android:background="@drawable/search_bar_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
             <SearchView
                 android:id="@+id/search_view_places"
-                android:padding="1dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:padding="1dp" />
         </LinearLayout>
-        <LinearLayout
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:orientation="vertical"
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_map_zoom_in"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_map_zoom_in"
-                android:src="@drawable/ic_zoom_in"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorWhite" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_map_zoom_out"
-                android:src="@drawable/ic_zoom_out"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorWhite" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_zoom_in"
+            app:backgroundTint="@color/colorWhite"
+            app:layout_constraintBottom_toTopOf="@+id/button_map_zoom_out"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_map_zoom_out"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_map_location"
-                android:src="@drawable/ic_location"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorWhite" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_map_compass"
-                android:src="@drawable/ic_compass"
-                android:layout_margin="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorWhite" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_zoom_out"
+            app:backgroundTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_map_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_location"
+            app:backgroundTint="@color/colorWhite"
+            app:layout_constraintBottom_toTopOf="@+id/button_map_compass"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_map_compass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_compass"
+            app:backgroundTint="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_bad_connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorRed"
+            android:gravity="center"
+            android:padding="2dp"
+            android:text="@string/bad_connection"
             android:textColor="@color/colorWhite"
             android:visibility="gone"
-            android:padding="2dp"
-            android:gravity="center"
-            android:background="@color/colorRed"
-            android:text="@string/bad_connection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </RelativeLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
