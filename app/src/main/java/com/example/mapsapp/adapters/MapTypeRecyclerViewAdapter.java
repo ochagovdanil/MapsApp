@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.mapsapp.R;
 import com.example.mapsapp.models.MapType;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class MapTypeRecyclerViewAdapter
 
     @Override
     public void onBindViewHolder(@NonNull MapTypeViewHolder mapTypeViewHolder, int i) {
-        mapTypeViewHolder.mImage.setBackgroundResource(mListTypeMaps.get(i).getSrcImage());
+        Picasso.get().load(mListTypeMaps.get(i).getSrcImage()).into(mapTypeViewHolder.mImage);
         mapTypeViewHolder.mText.setText(mListTypeMaps.get(i).getTypeName());
     }
 
